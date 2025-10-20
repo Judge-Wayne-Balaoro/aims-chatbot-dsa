@@ -220,7 +220,7 @@ class AIMSKnowledgeBase:
     def __init__(self):
         self.procedures = [
             {
-                'keywords': ['enroll', 'enrollment', 'register', 'enlist', 'add subject', 'registration'],
+                'keywords': ['enroll', 'enrollment', 'register', 'enlist', 'add subject'],
                 'category': 'Enrollment',
                 'response': """📄 **How to Enroll in Subjects via AIMS**
 
@@ -593,3 +593,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
