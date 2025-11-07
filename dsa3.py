@@ -79,7 +79,7 @@ class QueueManager:
 
     def process_next_message(self, knowledge_base):
         current_time = time.time()
-        if self.last_process_time and (current_time - self.last_process_time) < 1.0:
+        if self.last_process_time and (current_time - self.last_process_time) < 3.0:
             return False
 
         msg = self.dequeue()
@@ -114,7 +114,7 @@ class QueueManager:
                 return idx + 1
         return 0
 
-    def clean_inactive_users(self, timeout_seconds=15):  # <-- CHANGED: Reduced timeout
+    def clean_inactive_users(self, timeout_seconds=15):
         """Remove users who haven't been active for timeout_seconds"""
         current_time = datetime.now()
         inactive_users = []
@@ -134,8 +134,7 @@ class QueueManager:
         """A simple method to update a user's last seen timestamp."""
         self.active_users[user_id] = datetime.now().isoformat()
 
-    def get_queue_stats(self):  # <-- UPDATED METHOD
-        # Clean inactive users every time stats are requested
+    def get_queue_stats(self): 
         self.clean_inactive_users()
 
         try:
@@ -446,31 +445,25 @@ def main():
         initial_sidebar_state="collapsed"
     )
 
-    # Initialize knowledge base
     if 'knowledge_base' not in st.session_state:
         st.session_state.knowledge_base = AIMSKnowledgeBase()
 
-    # Initialize shared queue file if it doesn't exist
     if not QUEUE_FILE.exists():
         initial_queue = QueueManager()
         save_queue(initial_queue)
 
-    # Generate unique user ID per session
+
     if 'user_id' not in st.session_state:
         st.session_state.user_id = f"Student_{random.randint(1000, 9999)}"
 
-    # Personal chat history
     if 'my_chat' not in st.session_state:
         st.session_state.my_chat = []
-
-    # Load shared queue
+ 
     queue_manager = load_queue()
 
-    # Update this user's activity on every single rerun.
     queue_manager.update_user_activity(st.session_state.user_id)
     save_queue(queue_manager)
 
-    # Process one message from queue if available
     if queue_manager.message_queue:
         processed = queue_manager.process_next_message(st.session_state.knowledge_base)
         if processed:
@@ -593,4 +586,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
